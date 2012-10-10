@@ -10,5 +10,6 @@ class KalturaDistributionProtocol extends KalturaEnum
 	const SFTP = 3;
 	const HTTP = 4;
 	const HTTPS = 5;
+	const SFTP_CMD = 8; // SFTP Protocol
 	const ASPERA = 10;
 }
