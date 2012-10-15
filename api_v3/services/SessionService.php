@@ -137,6 +137,172 @@ class SessionService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
 		}
 	}
+
+	/**
+	 * Start an impersonated session with Kaltura's server.
+	 * The result KS info contains the session key that you should pass to all services that requires a ticket.
+	 * Type, expiry and privileges won't be changed if they're not set
+	 * 
+	 * @action impersonateByKs
+	 * @param string $session The old KS of the impersonated partner
+	 * @param KalturaSessionType $type Type of the new KS 
+	 * @param int $expiry Expiry time in seconds of the new KS
+	 * @param string $privileges Privileges of the new KS
+	 * @return KalturaSessionInfo
+	 *
+	 * @throws APIErrors::START_SESSION_ERROR
+	 */
+	function impersonateByKsAction($session, $type = null, $expiry = null , $privileges = null)
+	{
+		KalturaResponseCacher::disableCache();
+		
+		$oldKS = null;
+		try
+		{
+			$oldKS = ks::fromSecureString($session);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $this->getPartnerId());
+		}
+		$impersonatedPartnerId = $oldKS->partner_id;
+		$impersonatedUserId = $oldKS->user;
+		$impersonatedType = $oldKS->type; 
+		$impersonatedExpiry = $oldKS->valid_until - time(); 
+		$impersonatedPrivileges = $oldKS->privileges;
+		
+		if(!is_null($type))
+			$impersonatedType = $type;
+		if(!is_null($expiry)) 
+			$impersonatedExpiry = $expiry;
+		if($privileges) 
+			$impersonatedPrivileges = $privileges;
+		
+		// verify partner is allowed to start session for another partner
+		$impersonatedPartner = null;
+		if(!myPartnerUtils::allowPartnerAccessPartner($this->getPartnerId(), $this->partnerGroup(), $impersonatedPartnerId))
+		{
+			$c = PartnerPeer::getDefaultCriteria();
+			$c->addAnd(PartnerPeer::ID, $impersonatedPartnerId);
+			$impersonatedPartner = PartnerPeer::doSelectOne($c);
+		}
+		else
+		{
+			// get impersonated partner
+			$impersonatedPartner = PartnerPeer::retrieveByPK($impersonatedPartnerId);
+		}
+		
+		if(!$impersonatedPartner)
+		{
+			KalturaLog::err("Impersonated partner [$impersonatedPartnerId ]could not be fetched from the DB");
+			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $this->getPartnerId());
+		}
+		
+		// set the correct secret according to required session type
+		if($impersonatedType == KalturaSessionType::ADMIN)
+		{
+			$impersonatedSecret = $impersonatedPartner->getAdminSecret();
+		}
+		else
+		{
+			$impersonatedSecret = $impersonatedPartner->getSecret();
+		}
+		
+		$sessionInfo = new KalturaSessionInfo();
+		
+		$result = kSessionUtils::startKSession($impersonatedPartnerId, $impersonatedSecret, $impersonatedUserId, $sessionInfo->ks, $impersonatedExpiry, $impersonatedType, '', $impersonatedPrivileges, $this->getPartnerId());
+		if($result < 0)
+		{
+			KalturaLog::err("Failed starting a session with result [$result]");
+			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $this->getPartnerId());
+		}
+	
+		// getting the kuser from the db
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$c->add(kuserPeer::PARTNER_ID, $impersonatedPartnerId);
+		$c->add(kuserPeer::PUSER_ID, $impersonatedUserId);
+		$c->add(kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
+		
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::doSelectOne($c);
+		kuserPeer::setUseCriteriaFilter(true);
+		
+		// assign the kuser into KalturaUser object
+		$user = new KalturaUser();
+		if($kuser)
+		{
+			$user->fromObject($kuser);
+		}
+		else 
+		{
+			$user->id =  $impersonatedUserId;
+			$user->partnerId = $impersonatedPartnerId;
+			$user->screenName =  $impersonatedUserId;
+			$user->isAdmin = ($impersonatedType == KalturaSessionType::ADMIN);
+		}
+		
+		$sessionInfo->partnerId = $impersonatedPartnerId;
+		$sessionInfo->user = $user;
+		$sessionInfo->expiry = $impersonatedExpiry;
+		$sessionInfo->sessionType = $impersonatedType;
+		$sessionInfo->privileges = $impersonatedPrivileges;
+		
+		return $sessionInfo;
+	}
+
+	/**
+	 * Parse session key and return its info
+	 * 
+	 * @action get
+	 * @param string $session The KS to be parsed, keep it empty to use current session.
+	 * @return KalturaSessionInfo
+	 *
+	 * @throws APIErrors::START_SESSION_ERROR
+	 */
+	function getAction($session = null)
+	{
+		if(!$session)
+			$session = kCurrentContext::$ks;
+		
+		$ks = ks::fromSecureString($session);
+		
+		$sessionInfo = new KalturaSessionInfo();
+		$sessionInfo->ks = $session;
+		
+		// getting the kuser from the db
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$c->add(kuserPeer::PARTNER_ID, $ks->partner_id);
+		$c->add(kuserPeer::PUSER_ID, $ks->user);
+		$c->add(kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
+
+		
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::doSelectOne($c);
+		kuserPeer::setUseCriteriaFilter(true);
+		
+		// assign the kuser into KalturaUser object
+		$user = new KalturaUser();
+		if($kuser)
+		{
+			$user->fromObject($kuser);
+		}
+		else 
+		{
+			$user->id =  $ks->user;
+			$user->partnerId = $ks->partner_id;
+			$user->screenName =  $ks->user;
+			$user->isAdmin = ($ks->type == KalturaSessionType::ADMIN);
+		}
+		
+		$sessionInfo->partnerId = $ks->partner_id;
+		$sessionInfo->user = $user;
+		$sessionInfo->expiry = $ks->valid_until;
+		$sessionInfo->sessionType = $ks->type;
+		$sessionInfo->privileges = $ks->privileges;
+		
+		return $sessionInfo;
+	}
 	
 	/**
 	 * Start a session for Kaltura's flash widgets
