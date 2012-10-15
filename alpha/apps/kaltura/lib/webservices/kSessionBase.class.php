@@ -35,6 +35,7 @@ class kSessionBase
 	// KS V2 constants
 	const SHA1_SIZE = 20;
 	const RANDOM_SIZE = 16;
+	const AES_IV = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";	// no need for an IV since we add a random string to the message anyway
 	
 	const FIELD_EXPIRY =              '_e';
 	const FIELD_TYPE =                '_t';
@@ -275,7 +276,7 @@ class kSessionBase
 			substr(sha1($key, true), 0, 16),
 			$message,
 			MCRYPT_MODE_CBC, 
-			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+			self::AES_IV
 		);
 	}
 
@@ -286,7 +287,7 @@ class kSessionBase
 			substr(sha1($key, true), 0, 16),
 			$message,
 			MCRYPT_MODE_CBC, 
-			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+			self::AES_IV
 		);
 	}
 
@@ -315,7 +316,10 @@ class kSessionBase
 
 		// build fields string
 		$fieldsStr = http_build_query($fields, '', '&');
-		$fieldsStr = mcrypt_create_iv(self::RANDOM_SIZE) . $fieldsStr;
+		$rand = '';
+		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
+			$rand .= chr(rand(0, 0xff));
+		$fieldsStr = $rand . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
 		
 		// encrypt and encode
@@ -332,12 +336,12 @@ class kSessionBase
 		
 		$explodedKs = explode('|', $decodedKs , 3);
 		if (count($explodedKs) != 3 || $explodedKs[0] != 'v2')
-			return false;
+			return false;						// not KS V2
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
 		$adminSecret = $this->getAdminSecret($partnerId);
 		if (!$adminSecret)
-			return false;						// admin secret not found in APC, can't validate the KS
+			return false;						// admin secret not found, can't decrypt the KS
 				
 		$decKs = self::aesDecrypt($adminSecret, $encKs);
 		$decKs = rtrim($decKs, "\0");
@@ -345,7 +349,7 @@ class kSessionBase
 		$hash = substr($decKs, 0, self::SHA1_SIZE);
 		$fields = substr($decKs, self::SHA1_SIZE);
 		if ($hash != sha1($fields, true))
-			return false;
+			return false;						// invalid signature
 		
 		$rand = substr($fields, 0, self::RANDOM_SIZE);
 		$fields = substr($fields, self::RANDOM_SIZE);
@@ -371,6 +375,7 @@ class kSessionBase
 		}
 		
 		$this->hash = bin2hex($hash);
+		$this->real_str = $fields;
 		$this->original_str = $ks;
 		$this->partner_id = $partnerId;
 		$this->rand = bin2hex($rand);
