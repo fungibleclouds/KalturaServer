@@ -400,9 +400,12 @@ class playManifestAction extends kalturaAction
 		if (!method_exists($urlManager, 'getManifestUrl'))
 			return null;
 
-		$url = $this->getTokenizedManifestUrl('hdnetworksmil', 'a.smil');
-		
-		$flavor = $urlManager->getManifestUrl($url);
+		$this->format = StorageProfile::PLAY_FORMAT_HTTP;			
+		$flavors = $this->buildHttpFlavorsArray($duration);
+		if (!$flavors)
+			return null;
+
+		$flavor = $urlManager->getManifestUrl($flavors);
 		if (!$flavor)
 			return null;
 		
