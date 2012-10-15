@@ -18,8 +18,10 @@ FROM (
 	WHERE {OBJ_ID_CLAUSE} 
 		AND entry_media_type_id IN (1,2,5,6)
 		AND ev.partner_id = {PARTNER_ID} /* PARTNER_ID*/
+		AND ku.partner_id = {PARTNER_ID} /* PARTNER_ID*/
 		AND ev.created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
 			AND '{TO_TIME}' - interval {TIME_SHIFT} hour /*TO_TIME*/
+		AND ku.puser_id IN {PUSER_ID}	
 	 
 	GROUP BY ev.kuser_id,ku.screen_name,ev.entry_id,ev.entry_media_type_id
 ) a

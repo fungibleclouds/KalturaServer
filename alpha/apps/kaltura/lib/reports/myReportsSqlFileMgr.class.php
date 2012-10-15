@@ -163,11 +163,25 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total" => "",
 				"total_no_text" => "",		
 				"total_without_filter" => "total_no_filter",
+				"detail_by_app" => "detail_by_app",
+				"detail_by_context" => "detail_by_context",
+				"detail_by_context_by_app" => "detail_by_app",
+				"total_by_app" => "total_by_app",
+				"total_by_context" => "total_by_context",
+				"total_by_context_by_app" => "total_by_app",
+				"count_by_app" => "count_by_app",
+				"count_by_context" => "count_by_context",
+			 	"count_by_context_by_app" => "count_by_app",
+				"graph_by_app" => "user_engagement/graph_by_app",
+				"graph_by_context" => "user_engagement/graph_by_context",
+			 	"graph_by_context_by_app" => "user_engagement/graph_by_context_by_app",
 			),
 			"top_contributors" => array (
 				"detail" => "",
+				"detail_by_user" => "detail_by_user",
 				"detail_no_text" => "!detail",	
 				"count" => "",
+				"count_by_user" => "count_by_user",
 				"count_no_text" => "!count",	
 				"graph" => "",
 				"graph_no_text" => "!graph",
@@ -229,16 +243,6 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total_no_text" => "partner_usage/total_no_text",
 			),
 			
-			"widgets_stats" => array (
-				"detail" => "!graph",
-				"detail_no_text" => "!graph",
-				"count" => "!graph",
-				"count_no_text" => "!graph",
-				"total" => "!graph",
-				"total_no_text" => "!graph",
-				"graph" => ""				,
-				"graph_no_text" => "!graph",
-			),
 			"user_engagement_unique" => array (
 				"total_without_filter" => "user_engagement/unique_total_by_context",
 				"total_by_context" => "user_engagement/unique_total_by_context",
@@ -510,8 +514,6 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		}
 		if ( $for_objects )	
 				$flavor_str = $flavor_str . $for_objects;
-		
-			
 		
 			
 		if ( isset ( $report_type_mapping[$flavor_str ]))
