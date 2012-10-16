@@ -574,6 +574,8 @@ class playManifestAction extends kalturaAction
 	 */
 	private function sortFlavors($flavors)
 	{
+		$this->preferredFlavor = null;
+		
 		if ($this->preferredBitrate !== null)
 		{
 			foreach ($flavors as $flavor)
