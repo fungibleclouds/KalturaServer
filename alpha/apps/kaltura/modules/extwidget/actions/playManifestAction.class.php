@@ -400,8 +400,11 @@ class playManifestAction extends kalturaAction
 		if (!method_exists($urlManager, 'getManifestUrl'))
 			return null;
 
+		$originalFormat = $this->format;
 		$this->format = StorageProfile::PLAY_FORMAT_HTTP;			
 		$flavors = $this->buildHttpFlavorsArray($duration);
+		$this->format = $originalFormat;
+		
 		if (!$flavors)
 			return null;
 
