@@ -408,6 +408,9 @@ class playManifestAction extends kalturaAction
 		if (!$flavors)
 			return null;
 
+		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			$flavors = $this->sortFlavors($flavors);	
+
 		$flavor = $urlManager->getManifestUrl($flavors);
 		if (!$flavor)
 			return null;
