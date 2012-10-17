@@ -662,6 +662,8 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($assetDb->getEntryId(), $id);
+		
 		if (!$assetDb->isLocalReadyStatus())
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
@@ -725,6 +727,8 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($flavorAssetDb->getEntryId(), $id);		
+			
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 

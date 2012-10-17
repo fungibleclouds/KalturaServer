@@ -430,6 +430,8 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($assetDb->getEntryId(), $id);
+		
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
 

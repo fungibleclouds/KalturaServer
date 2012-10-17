@@ -429,16 +429,14 @@ class asset extends Baseasset implements ISyncableFile
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
+			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
 			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
 	
 			if ($result < 0)
-				throw new Exception("Failed to generate session for flavor asset [".$this->getId()."]");
+				throw new Exception("Failed to generate session for asset [".$this->getId()."] of type ". $this->getType());
 		}
 		
-		$finalPath = myPartnerUtils::getUrlForPartner($this->getPartnerId(),$this->getPartnerId()*100).
-			"/download".
-			"/entry_id/".$this->getEntryId().
-			"/flavor/".$this->getId();
+		$finalPath = $this->getFinalDownloadUrlPathWithoutKs();
 		
 		if ($ksStr)
 			$finalPath .= "/ks/".$ksStr;
@@ -454,6 +452,16 @@ class asset extends Baseasset implements ISyncableFile
 			$downloadUrl = requestUtils::getRequestHost() . $finalPath;
 		
 		return $downloadUrl;
+	}
+	
+	protected function getFinalDownloadUrlPathWithoutKs()
+	{
+		$finalPath = myPartnerUtils::getUrlForPartner($this->getPartnerId(),$this->getPartnerId()*100).
+					"/download".
+					"/entry_id/".$this->getEntryId().
+					"/flavor/".$this->getId();
+		
+		return $finalPath;
 	}
 	
 	public function hasTag($v)
