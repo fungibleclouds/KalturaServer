@@ -41,7 +41,6 @@ kmc.functions = {
 			protocol 			: window.location.protocol + '//',
 			partnerid			: kmc.vars.partner_id,
 			subpid				: kmc.vars.subp_id,
-			uid					: kmc.vars.user_id,
 			ks					: kmc.vars.ks,
 			entryId				: "-1",
 			kshowId				: "-1",
@@ -99,7 +98,6 @@ kmc.functions = {
 			host			: kmc.vars.host,
 			cdnhost			: kmc.vars.cdn_host,
 			protocol 		: window.location.protocol.slice(0, -1),
-			userId			: kmc.vars.user_id,
 			partnerid		: kmc.vars.partner_id,
 			subPartnerId	: kmc.vars.subp_id,
 			sessionId		: kmc.vars.ks,
@@ -161,7 +159,7 @@ kmc.functions = {
 		
 		var iframe_url = kmc.vars.base_url + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
-			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&userId=' + kmc.vars.user_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
+			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
 		var title = ( mode == 'trim' ) ? 'Trimming Tool' : 'Clipping Tool';
 
@@ -970,7 +968,7 @@ kmc.client = {
 		
 		var filter = {
 			"filter:objectType"		: "KalturaShortLinkFilter",
-			"filter:userIdEqual"	: kmc.vars.user_id,
+			"filter:statusEqual"	: 2,
 			"filter:systemNameEqual": "KMC-PREVIEW"
 		};
 		
@@ -996,7 +994,6 @@ kmc.client = {
 			
 		var data = {
 			"shortLink:objectType"	: "KalturaShortLink",
-			"shortLink:userId"		: kmc.vars.user_id,
 			"shortLink:systemName"	: "KMC-PREVIEW", // Unique name for filtering
 			"shortLink:fullUrl"		: url
 		};
