@@ -180,6 +180,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$comment = $pdo->getComment();
 		$sphinxIdField = $this->getSphinxIdField();
 		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='$comment'";
+		if (kConf::hasParam('sphinx_extra_options'))
+			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
 		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
 
