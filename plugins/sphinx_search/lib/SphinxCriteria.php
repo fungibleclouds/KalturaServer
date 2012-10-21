@@ -187,7 +187,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 		foreach($badSphinxQueries as $badQuery)
 		{
-			if (strpos($sql, $badQuery) !== false)
+			if (preg_match($badQuery, $sql))
 			{
 				KalturaLog::log("bad sphinx query: [$badQuery] $sql");
 				KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
