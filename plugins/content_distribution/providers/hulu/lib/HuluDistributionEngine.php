@@ -58,6 +58,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
+		$captionsFilesPaths = $providerData->captionLocalPaths;
 		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
 		
 		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
@@ -77,7 +78,15 @@ class HuluDistributionEngine extends DistributionEngine implements
 				$fileManager->putFile($videoSFTPPath, $videoFilePath);
 				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
 					$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
-				
+					
+				foreach ($captionsFilesPaths as $captionFilePath){
+					if(file_exists($captionFilePath->value)){
+						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
+						$captionSFTPPath = $sftpBasePath.'/'.$remoteCaptionFileName;
+						KalturaLog::info('$captionSFTPPath:' . $captionSFTPPath);
+						$fileManager->putFile($captionSFTPPath, $captionFilePath->value);
+					}
+				}
 				$fileManager->filePutContents($xmlSFTPPath, $xml);
 				break;
 			case KalturaDistributionProtocol::ASPERA:
@@ -99,6 +108,12 @@ class HuluDistributionEngine extends DistributionEngine implements
 				}
 				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
 					$this->uploadFileWithAspera($host, $username, $thumbAssetFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteThumbFileName );
+				foreach ($captionsFilesPaths as $captionFilePath){
+					if(file_exists($captionFilePath->value)){
+						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
+						$this->uploadFileWithAspera($host, $username, $captionFilePath->value, $password, $privateKeyTempPath, $passphrase, $port, $remoteCaptionFileName);
+					}
+				}
 				if($xmlTempPath && file_exists($xmlTempPath))
 					$this->uploadFileWithAspera($host, $username, $xmlTempPath, $password, $privateKeyTempPath, $passphrase, $port, $remoteXmlFileName);
 				break;

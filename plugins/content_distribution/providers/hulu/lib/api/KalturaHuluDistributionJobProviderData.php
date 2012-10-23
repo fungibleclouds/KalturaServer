@@ -25,6 +25,11 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 	 */
 	public $fileBaseName;
 	
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $captionLocalPaths;
+	
  
 	/**
 	 * Called on the server side and enables you to populate the object with any data from the DB
@@ -41,7 +46,6 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 		if(!($distributionJobData->distributionProfile instanceof KalturaHuluDistributionProfile))
 			return;
 			
-		$this->videoAssetFilePaths = new KalturaStringArray();
 		
 		// loads all the flavor assets that should be submitted to the remote destination site
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
@@ -58,6 +62,26 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 			$thumbAsset = reset($thumbAssets);
 			$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+		}
+		
+		$additionalAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->assetIds));
+		$this->captionLocalPaths = new KalturaStringArray();
+		if(count($additionalAssets))
+		{
+			$captionAssetFilePathArray = array();
+			foreach ($additionalAssets as $additionalAsset)
+			{	
+				$assetType = $additionalAsset->getType();
+				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey)){
+					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
+						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){
+						$string = new KalturaString();
+						$string->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, false); 
+						$this->captionLocalPaths[] =  $string;
+					}
+				}
+			}
 		}
 		
 		$tempFieldValues = unserialize($this->fieldValues);
