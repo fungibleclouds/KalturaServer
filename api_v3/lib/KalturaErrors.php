@@ -206,6 +206,11 @@ class KalturaErrors extends APIErrors
 	const THUMB_PARAMS_OUTPUT_ID_NOT_FOUND = "THUMB_PARAMS_OUTPUT_ID_NOT_FOUND,Thumbnail params output id \"%s\" not found";
 	
 	/**
+	 * KalturaAsset Service
+	 */
+	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND,Asset id \"%s\" not found";
+	
+	/**
 	 * FlavorAsset Service
 	 */
 	const FLAVOR_ASSET_ID_NOT_FOUND = "FLAVOR_ASSET_ID_NOT_FOUND,Flavor asset id \"%s\" not found";
