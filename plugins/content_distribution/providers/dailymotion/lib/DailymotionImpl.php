@@ -109,6 +109,19 @@ class DailyMotionImpl
 		return self::$categoriesMap;
 	}
 	
+	public function uploadSubtitle($remoteVideoId, KalturaDailymotionDistributionCaptionInfo $captionInfo) {
+		$url = $this->api->uploadFile ( $captionInfo->filePath );
+		$args = array ();
+		$args ['url'] = $url;
+		$args ['language'] = $captionInfo->language;
+		$args ['format'] = $this->getCaptionFormate ( $captionInfo->format );
+		$tempApiEndpointUrl = $this->api->apiEndpointUrl;
+		$this->api->apiEndpointUrl = self::NEW_API_END_POINT_URL;
+		$response = $this->call ( "POST /video/$remoteVideoId/subtitles", $args );
+		$this->api->apiEndpointUrl = $tempApiEndpointUrl;
+		return $response['id'];
+	}
+	
 	public function updateSubtitle($remoteSubtitleId, KalturaDailymotionDistributionCaptionInfo $captionInfo) {
 		$url = $this->api->uploadFile ( $captionInfo->filePath );
 		$args = array ();
