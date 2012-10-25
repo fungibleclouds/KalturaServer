@@ -11,4 +11,5 @@ class KalturaCaptionErrors extends KalturaErrors
 	const CAPTION_ASSET_IS_NOT_READY = "CAPTION_ASSET_IS_NOT_READY,Caption asset \"%s\" is not ready";
 	const CAPTION_ASSET_IS_DEFAULT = "CAPTION_ASSET_IS_DEFAULT,Caption asset \"%s\" is default";
 	const CAPTION_ASSET_DOWNLOAD_FAILED = "CAPTION_ASSET_DOWNLOAD_FAILED,Caption asset download from URL \"%s\" failed";
+	const UKNOWN_CAPTION_ASSET_FORMAT = "UKNOWN_CAPTION_ASSET_FORMAT,Caption asset \"%s\" has unknown format";
 }
