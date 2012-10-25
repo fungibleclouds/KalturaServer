@@ -242,7 +242,8 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 					return KalturaDailymotionDistributionCaptionFormat::TT;	
 			}
 		}
-		KalturaLog::err("caption [".$asset->getId()."] has an unknow format.");
-		return null;
+		KalturaLog::err("caption [".$asset->getId()."] has an unknow format. setting to default:[".KalturaDailymotionDistributionCaptionFormat::TT."]");
+		//dailymotion default is TT
+		return KalturaDailymotionDistributionCaptionFormat::TT;
 	}
 }
