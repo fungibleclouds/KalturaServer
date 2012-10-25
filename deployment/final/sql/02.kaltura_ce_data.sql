@@ -437,7 +437,9 @@ insert  into `permission`(`id`,`type`,`name`,`friendly_name`,`description`,`part
 (192,1,'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE_PAID','System admin config publisher paid package service','Permission to modify publishers packages service into paid package',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (193,1,'MANAGE_ADMIN_USERS','manage KMC users and roles','manage KMC users and roles',0,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (194,1,'SYSTEM_ADMIN_MP_REDIRECT','Base system admin permission','',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
-(195,2,'FEATURE_END_USER_REPORTS',NULL,NULL,99,1,NULL,NULL,now(),now(),NULL);
+(195,2,'FEATURE_END_USER_REPORTS',NULL,NULL,99,1,NULL,NULL,now(),now(),NULL),
+(196,'1','HOSTED_PAGES_BASE','Hosted pages access','Hosted pages access','-3','1','','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
+(197,'4','PARTNER_-3_GROUP_*_PERMISSION','Hosted pages permission for all partners','Hosted pages permission for all partners','-3','1','','',now(),now(),'a:1:{s:13:\"partner_group\";s:1:\"*\";}');
 
 insert  into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`param_3`,`param_4`,`param_5`,`tags`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',NULL,now(),now(),NULL),
@@ -1277,7 +1279,9 @@ insert  into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`par
 (835,'kApiActionPermissionItem',0,'varconsole_varconsole','checkuserlogindataexists','','','',NULL,now(),now(),NULL),
 (836,'kApiActionPermissionItem',0,'varconsole_varconsole','updatestatus','','','',NULL,now(),now(),NULL),
 (837,'kApiActionPermissionItem',0,'partner','count','','','',NULL,now(),now(),NULL),
-(838,'kApiParameterPermissionItem',0,'KalturaPartner','partnerGroupType','read','','',NULL,now(),now(),NULL);
+(838,'kApiParameterPermissionItem',0,'KalturaPartner','partnerGroupType','read','','',NULL,now(),now(),NULL),
+(839,'kApiActionPermissionItem','0','session','get','','','',NULL,now(),now(),NULL),
+(840,'kApiActionPermissionItem','-3','session','impersonatebyks','','','',NULL,now(),now(),NULL);
 
 insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_item_id`,`created_at`,`updated_at`) values 
 (10,67,2,now(),now()),
@@ -3367,7 +3371,12 @@ insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_it
 (119488,118,770,now(),now()),
 (119489,118,771,now(),now()),
 (119490,118,838,now(),now()),
-(119491,117,708,now(),now());
+(119491,117,708,now(),now()),
+(119492,5,839,now(),now()),
+(119493,196,839,now(),now()),
+(119494,197,839,now(),now()),
+(119495,196,840,now(),now()),
+(119496,197,840,now(),now());
 
 insert  into `storage_profile`(`id`,`created_at`,`updated_at`,`partner_id`,`name`,`system_name`,`desciption`,`status`,`protocol`,`storage_url`,`storage_base_dir`,`storage_username`,`storage_password`,`storage_ftp_passive_mode`,`delivery_http_base_url`,`delivery_rmp_base_url`,`delivery_iis_base_url`,`min_file_size`,`max_file_size`,`flavor_params_ids`,`max_concurrent_connections`,`custom_data`,`path_manager_class`,`url_manager_class`,`delivery_priority`,`delivery_status`) values 
 (0,now(),now(),0,'@DC_NAME@','','@DC_DESCRIPTION@',3,0,NULL,'@STORAGE_BASE_DIR@',NULL,NULL,NULL,'@DELIVERY_HTTP_BASE_URL@','@DELIVERY_RTMP_BASE_URL@','@DELIVERY_ISS_BASE_URL@',NULL,NULL,NULL,NULL,NULL,NULL,'',1,1);
