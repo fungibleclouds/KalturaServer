@@ -49,7 +49,7 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 
 		// look for krule with action block and condition of country
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
-		if ($entry->getAccessControl())
+		if ($entry && $entry->getAccessControl())
 			$this->setGeoBlocking($entry->getAccessControl());
 			
 		$this->addCaptionsData($distributionJobData);
@@ -242,6 +242,6 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 					return KalturaDailymotionDistributionCaptionFormat::TT;	
 			}
 		}
-		throw new KalturaAPIException("caption [$asset->id] has an unknow format.");
+		throw new KalturaAPIException(KalturaDailyMotionErrors::INVALID_ASSET_FORMAT, $asset->getId());
 	}
 }
