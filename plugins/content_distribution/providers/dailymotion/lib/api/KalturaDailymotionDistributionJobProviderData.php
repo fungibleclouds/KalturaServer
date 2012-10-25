@@ -236,12 +236,13 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 			
 		if ($asset instanceof  captionAsset){
 			switch ($asset->getContainerFormat()){
-				case KalturaCaptionType::SRT:
+				case CaptionType::SRT:
 					return KalturaDailymotionDistributionCaptionFormat::SRT;
-				case KalturaCaptionType::DFXP:
+				case CaptionType::DFXP:
 					return KalturaDailymotionDistributionCaptionFormat::TT;	
 			}
 		}
-		throw new KalturaAPIException(KalturaDailyMotionErrors::INVALID_ASSET_FORMAT, $asset->getId());
+		KalturaLog::err("caption [".$asset->getId()."] has an unknow format.");
+		return null;
 	}
 }
