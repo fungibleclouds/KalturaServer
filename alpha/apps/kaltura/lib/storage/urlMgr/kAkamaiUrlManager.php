@@ -86,7 +86,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
 		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
 		if($this->protocol==StorageProfile::PLAY_FORMAT_RTSP) {
 			return $url;
 		}
@@ -122,7 +122,7 @@ class kAkamaiUrlManager extends kUrlManager
 			else
 			{		
 				if($this->extention)
-					$url .= "/name/$flavorAssetId.$this->extention";
+					$url .= "/name/a.$this->extention";
 						
 				if($this->seekFromTime > 0)
 				{
