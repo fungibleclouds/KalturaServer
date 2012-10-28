@@ -7,7 +7,7 @@ fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 
 COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
-POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh"
+POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh @APP_DIR@/plugins/sphinx_search/scripts/configs/server-sphinx.php"
 
 # Source function library
 . /etc/rc.d/init.d/functions
