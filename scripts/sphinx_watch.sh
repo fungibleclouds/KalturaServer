@@ -1,4 +1,8 @@
 #!/bin/bash
+# Kaltura dedicated Sphinx     This shell script takes care of starting and stopping a Kaltura Batch Service
+#
+# chkconfig: 2345 13 87
+# description: Kaltura dedicated Sphinx
 if [ -L $0 ];then
 	REAL_SCRIPT=`readlink $0`
 else
