@@ -5,7 +5,7 @@ class kQueryCache
 	const INVALIDATION_TIME_MARGIN_SEC = 60;		// When comparing the invalidation key timestamp to the query timestamp, 
 													// the query timestamp should be greater by this value to use the cache
 	const QUERY_MASTER_TIME_MARGIN_SEC = 300;		// The time frame after a change to a row during which we should query the master
-	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
+	const MAX_CACHED_OBJECT_COUNT = 250;			// Select queries that return more objects than this const will not be cached
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
 	const INVALIDATION_KEYS_EXPIRY_MARGIN = 3600;	// An extra expiry time given to invalidation keys over cached queries
 
