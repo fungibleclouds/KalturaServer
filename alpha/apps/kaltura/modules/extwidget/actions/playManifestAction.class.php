@@ -403,12 +403,22 @@ class playManifestAction extends kalturaAction
 			return null;
 		}
 
-		$url = $this->getTokenizedManifestUrl('hdnetworksmil', 'a.smil');
+		$originalFormat = $this->format;
+		$this->format = StorageProfile::PLAY_FORMAT_HTTP;	
+		$duration = null;		
+		$flavors = $this->buildHttpFlavorsArray($duration);
+		$this->format = $originalFormat;
 		
-		$flavor = $urlManager->getManifestUrl($url);
+		if (!$flavors)
+			return null;
+
+		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			$flavors = $this->sortFlavors($flavors);	
+
+		$flavor = $urlManager->getManifestUrl($flavors);
 		if (!$flavor)
 		{
-			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find lavor');
+			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find flavor');
 			return null;
 		}
 		
@@ -571,6 +581,8 @@ class playManifestAction extends kalturaAction
 	 */
 	private function sortFlavors($flavors)
 	{
+		$this->preferredFlavor = null;
+		
 		if ($this->preferredBitrate !== null)
 		{
 			foreach ($flavors as $flavor)
