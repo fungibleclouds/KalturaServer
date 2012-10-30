@@ -42,10 +42,11 @@ class UverseClickToOrderService extends KalturaBaseService
 		$entryFilter = new entryFilter();
 		$entryFilter->setStatusEquel(entryStatus::READY);
 		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerIdEquel($this->getPartnerId());
+		$entryFilter->setPartnerSearchScope($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$entryFilter->attachToCriteria($baseCriteria);
 		$baseCriteria->addDescendingOrderByColumn(entryPeer::UPDATED_AT);
 		$entries = entryPeer::doSelect($baseCriteria);

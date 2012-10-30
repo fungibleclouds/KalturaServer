@@ -65,7 +65,7 @@ class DoubleClickService extends KalturaBaseService
 		$entryFilter = new entryFilter();
 		$entryFilter->setStatusEquel(entryStatus::READY);
 		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerIdEquel($this->getPartnerId());
+		$entryFilter->setPartnerSearchScope($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		$entryFilter->set('_order_by', '-created_at');
 		if ($period && $period > 0)
@@ -73,6 +73,7 @@ class DoubleClickService extends KalturaBaseService
 			
 		// Dummy query to get the total count
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$baseCriteria->setLimit(1);
 		$entryFilter->attachToCriteria($baseCriteria);
 		$entries = entryPeer::doSelect($baseCriteria);
@@ -85,6 +86,7 @@ class DoubleClickService extends KalturaBaseService
 			$entryFilter->set('_notin_id', $stateLastEntryIds);
 
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$baseCriteria->setLimit($profile->getItemsPerPage() + 1); // get +1 to check if we have next page
 		$entryFilter->attachToCriteria($baseCriteria);
 		$entries = entryPeer::doSelect($baseCriteria);
