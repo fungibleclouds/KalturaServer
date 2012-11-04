@@ -1,5 +1,6 @@
 <?php
 setlocale(LC_ALL, 'en_US.UTF-8');
+libxml_disable_entity_loader(true);
 
 /**
  * Manages all Kaltura configurations
