@@ -57,6 +57,38 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $streamUrl;
 	
+	/**
+	 * HLS URL - URL for live stream playback on mobile device
+	 * @var string
+	 */
+	public $hlsStreamUrl;
+	
+	/**
+	 * Unique idenitifier for the string opposite the provider
+	 * @var string
+	 */
+	public $externalStreamId;
+	
+	/**
+	 * DVR Status Enabled/Disabled
+	 * @var KalturaDVRStatus
+	 */
+	public $dvrStatus;
+	
+	/**
+	 * Window of time which the DVR allows for backwards scrubbing (in seconds)
+	 * @var int
+	 */
+	public $dvrWindow;
+	
+	/**
+	 * URL Manager to handle the live stream URL (for instance, add token)
+	 * @var string
+	 */
+	public $urlManager;
+	
+	
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -66,6 +98,11 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		"secondaryBroadcastingUrl",
 		"streamName",
 		"streamUrl",
+	    "hlsStreamUrl",
+	    "externalStreamId",
+	    "dvrStatus",
+	    "dvrWindow",
+	    "urlManager",
 	);
 
 	public function __construct()
