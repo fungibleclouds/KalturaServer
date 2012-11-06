@@ -211,11 +211,15 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			'value'			=> $this->templateType,
 		));
 	
+		$excludes = array(Kaltura_Client_EventNotification_Enum_EventNotificationEventType::BATCH_JOB_STATUS);
 		$element = $this->getElement('event_type');
 		$reflect = new ReflectionClass('Kaltura_Client_EventNotification_Enum_EventNotificationEventType');
 		$types = $reflect->getConstants();
 		foreach($types as $constName => $value)
 		{
+			if(in_array($value, $excludes))
+				continue;
+				
 			$name = ucfirst(str_replace('_', ' ', strtolower($constName)));
 			$element->addMultiOption($value, $name);
 		}
@@ -240,6 +244,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			$this->addElement('text', "condition_{$this->conditionsCount}", array(
 				'label'			=> 'Condition:',
 				'value'			=> $condition->field->code,
+				'readonly'		=> true,
 				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
 			));
 			
