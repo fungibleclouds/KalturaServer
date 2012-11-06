@@ -3049,4 +3049,54 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+	
+	public function getHlsStreamUrl ()
+	{
+	    return $this->getFromCustomData("hls_stream_url");
+	}
+	
+	public function setHlsStreamUrl ($v)
+	{
+	    $this->putInCustomData("hls_stream_url", $v);
+	}
+	
+	public function getExternalStreamId ()
+	{
+	    return $this->getFromCustomData("external_stream_id");
+	}
+
+	public function setExternalStreamId ($v)
+	{
+	     $this->putInCustomData("external_stream_id", $v);  
+	}
+	
+	public function getDvrStatus ()
+	{
+	    return $this->getFromCustomData("dvr_status");
+	}
+	
+	public function setDvrStatus ($v)
+	{
+	    $this->putInCustomData("dvr_status", $v);
+	}
+	
+    public function getDvrWindow ()
+	{
+	    return $this->getFromCustomData("dvr_window");
+	}
+	
+	public function setDvrWindow ($v)
+	{
+	    $this->putInCustomData("dvr_window", $v);
+	}
+	
+    public function getUrlManager ()
+	{
+	    return $this->getFromCustomData("url_manager");
+	}
+	
+	public function setUrlManager ($v)
+	{
+	    $this->putInCustomData("url_manager", $v);
+	}
 }
