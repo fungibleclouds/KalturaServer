@@ -103,7 +103,7 @@ $engine = new DailymotionDistributionEngine();
 $engine->submit($distributionJobData);
 
 
-//$xml = new DOMDocument();
+//$xml = new KDOMDocument();
 //if(!$xml->loadXML($mrss))
 //{
 //	KalturaLog::err("MRSS not is not valid XML:\n$mrss\n");
@@ -111,7 +111,7 @@ $engine->submit($distributionJobData);
 //}
 //
 //$xslPath = 'submit.xsl';
-//$xsl = new DOMDocument();
+//$xsl = new KDOMDocument();
 //$xsl->load($xslPath);
 //			
 //// set variables in the xsl

@@ -119,7 +119,7 @@ $delData->remoteId = $distributionJobData->remoteId;
 echo $engine->delete($delData);
 
 
-//$xml = new DOMDocument();
+//$xml = new KDOMDocument();
 //if(!$xml->loadXML($mrss))
 //{
 //	KalturaLog::err("MRSS not is not valid XML:\n$mrss\n");
@@ -127,7 +127,7 @@ echo $engine->delete($delData);
 //}
 //
 //$xslPath = 'submit.xsl';
-//$xsl = new DOMDocument();
+//$xsl = new KDOMDocument();
 //$xsl->load($xslPath);
 //			
 //// set variables in the xsl
