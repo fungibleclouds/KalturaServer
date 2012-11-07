@@ -65,7 +65,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_StorageProfileReadyBehavior', $storage->readyBehavior); ?></td>
 				<td><?php echo $this->dateFormat($storage->createdAt, Zend_Date::DATE_LONG); ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, <?php echo $storage->id; ?>)">
+					<select class="options" onchange="doAction(this.value, <?php echo $storage->partnerId; ?>, <?php echo $storage->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($storage->status == Kaltura_Client_Enum_StorageProfileStatus::DISABLED): ?>
@@ -110,7 +110,7 @@ jQuery('#filter_type').change(function() {
 
 jQuery('#filter_type').change();
 
-function doAction(action, storageId) {
+function doAction(action, partnerId, storageId) {
 	if (action && eval('typeof ' + action) == 'function')
 	{
 		f = eval(action);
@@ -124,7 +124,7 @@ var dialogDiv;
 function newStorage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage')); ?>' + '/new_partner_id/' + partnerId;
 	
-	jQuery('#partner-configure-dialog').remove();
+	jQuery('#storage-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
@@ -168,10 +168,11 @@ function newStorageSuccess(html) {
 	jQuery('#frmStorageConfig').replaceWith(html);
 	jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
 }
-function configure(storageId) {
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'storageId' => '')); ?>' + storageId;
+function configure(partnerId, storageId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'partnerId' => 'PARTNER_ID', 'storageId' => '')); ?>' + storageId;
+	url = url.replace('PARTNER_ID', partnerId);
 	
-	jQuery('#partner-configure-dialog').remove();
+	jQuery('#storage-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
@@ -202,12 +203,13 @@ function configure(storageId) {
 	);
 }
 
-function setManual(storageId)
+function setManual(partnerId, storageId)
 {
 	var ok = confirm('<?php echo $this->translate('are you sure manual storage?'); ?>');
 	if (ok)
 	{
 		changeStatus(
+				partnerId, 
 				storageId, 
 			<?php echo Kaltura_Client_Enum_StorageProfileStatus::MANUAL; ?>, 
 			function() {
@@ -217,12 +219,13 @@ function setManual(storageId)
 	}
 }
 
-function setAutomatic(storageId)
+function setAutomatic(partnerId, storageId)
 {
 	var ok = confirm('<?php echo $this->translate('are you sure auto storage?'); ?>');
 	if (ok)
 	{
 		changeStatus(
+				partnerId, 
 				storageId, 
 			<?php echo Kaltura_Client_Enum_StorageProfileStatus::AUTOMATIC; ?>, 
 			function() {
@@ -232,12 +235,13 @@ function setAutomatic(storageId)
 	}
 }
 
-function disable(storageId)
+function disable(partnerId, storageId)
 {
 	var ok = confirm('<?php echo $this->translate('are you sure disable storage?'); ?>');
 	if (ok)
 	{
 		changeStatus(
+				partnerId, 
 				storageId, 
 			<?php echo Kaltura_Client_Enum_StorageProfileStatus::DISABLED; ?>, 
 			function() {
@@ -247,11 +251,12 @@ function disable(storageId)
 	}
 }
 
-function changeStatus(storageId, status, callback)
+function changeStatus(partnerId, storageId, status, callback)
 {
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-storage-status', 'storageId' => 'STORAGE_ID', 'status' => 'STATUS')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-storage-status', 'storageId' => 'STORAGE_ID', 'partnerId' => 'PARTNER_ID', 'status' => 'STATUS')); ?>';
 	url = url.replace('STATUS', status);
 	url = url.replace('STORAGE_ID', storageId);
+	url = url.replace('PARTNER_ID', partnerId);
 	jQuery.ajax({
 		url: url,
 		dataType: 'json',
