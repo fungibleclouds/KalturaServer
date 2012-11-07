@@ -176,7 +176,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 			throw new kCuePointException("XML file [$xmlPath] not found", kCuePointException::XML_FILE_NOT_FOUND);
 			
 		KalturaLog::debug('xml [' . file_get_contents($xmlPath) . ']');
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		if(!$xml->load($xmlPath))
@@ -195,7 +195,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePointXmlParser');
-		$scenes = new SimpleXMLElement($xmlPath, null, true);
+		$scenes = new SimpleXMLElement(file_get_contents($xmlPath));
 		$cuePoints = array();
 		
 		foreach($scenes as $scene)
@@ -256,7 +256,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		$xmlContent = $scenes->asXML();
 	
 		KalturaLog::debug("xml [$xmlContent]");
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		if(!$xml->loadXML($xmlContent))

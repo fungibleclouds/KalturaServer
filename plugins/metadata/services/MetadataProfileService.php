@@ -35,7 +35,7 @@ class MetadataProfileService extends KalturaBaseService
 		// validates the xsd
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xsdData))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xsdData);
@@ -90,7 +90,7 @@ class MetadataProfileService extends KalturaBaseService
 		// validates the xsd
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->load($filePath))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xsdFile));
