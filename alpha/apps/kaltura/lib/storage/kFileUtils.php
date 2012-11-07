@@ -208,10 +208,10 @@ public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
 		else
 		{
 			// Set callback function for body
-			curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileBase::read_body');
+			curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		}
 		// Set callback function for headers
-		curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'kFileBase::read_header');
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'kFileUtils::read_header');
 		
 		//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 		
