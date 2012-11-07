@@ -110,7 +110,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	protected function getEventObjectType(KalturaEvent $event) 
 	{
 		if($event instanceof kBatchJobStatusEvent)
-			return EventNotificationEventObjectType::BATCHJOB;
+			return 'BatchJob';
 			
 		if(!method_exists($event, 'getObject'))
 			return null;
@@ -175,9 +175,9 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			}
 			
 			$templateObjectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $notificationTemplate->getObjectType());
-			if($eventObjectClassName != $templateObjectClassName && !is_subclass_of($eventObjectClassName, $templateObjectClassName))
+			if(strcmp($eventObjectClassName, $templateObjectClassName) && !is_subclass_of($eventObjectClassName, $templateObjectClassName))
 			{
-				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] object type [$templateObjectClassName] is not sub-class of event object type [$templateObjectClassName]");
+				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] object type [$eventObjectClassName] is not sub-class of event object type [$templateObjectClassName]");
 				continue;				
 			}
 			
