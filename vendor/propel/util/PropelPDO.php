@@ -122,6 +122,7 @@ class PropelPDO extends PDO {
 	 */
 	public function beginTransaction()
 	{
+		return true;//disable transactions
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ( $opcount === 0 ) {
@@ -141,6 +142,11 @@ class PropelPDO extends PDO {
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ($opcount > 0) {
+			if (class_exists("KalturaLog"))
+			{
+				KalturaLog::Log("called commit opcount:$opcount");
+			}
+
 			if ($opcount === 1) {
 				if ($this->isUncommitable) {
 					throw new PropelException('Cannot commit because a nested transaction was rolled back');
@@ -163,6 +169,11 @@ class PropelPDO extends PDO {
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ($opcount > 0) {
+			if (class_exists("KalturaLog"))
+			{
+				KalturaLog::Log("called rollBack");
+			}
+
 			if ($opcount === 1) { 
 				$return = parent::rollBack(); 
 			} else {
@@ -183,6 +194,11 @@ class PropelPDO extends PDO {
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ($opcount > 0) {
+			if (class_exists("KalturaLog"))
+			{
+				KalturaLog::Log("called forceRollback");
+			}
+
 			// If we're in a transaction, always roll it back
 			// regardless of nesting level.
 			$return = parent::rollBack();
