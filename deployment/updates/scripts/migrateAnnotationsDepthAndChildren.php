@@ -36,7 +36,6 @@ kEventsManager::enableDeferredEvents(false);
 
 $criteria = new Criteria();
 $criteria->add(CuePointPeer::TYPE, AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
-$criteria->add(CuePointPeer::PARENT_ID, 0, Criteria::GREATER_THAN);
 if($startUpdatedAt)
 	$criteria->add(CuePointPeer::UPDATED_AT, $startUpdatedAt, Criteria::GREATER_THAN);
 $criteria->addAscendingOrderByColumn(CuePointPeer::UPDATED_AT);
