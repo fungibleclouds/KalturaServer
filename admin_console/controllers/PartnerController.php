@@ -238,11 +238,7 @@ class PartnerController extends Zend_Controller_Action
 		$form = new Form_Partner_StorageConfiguration();
 		$request = $this->getRequest();
 		$form->populate($request->getParams());
-		Form_Partner_StorageHelper::addProtocolsToForm($form);
-		Form_Partner_StorageHelper::addPathManagersToForm($form);
-		Form_Partner_StorageHelper::addUrlManagersToForm($form);
-		Form_Partner_StorageHelper::addTriggersToForm($form);
-		
+	
 		$request = $this->getRequest();
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
@@ -279,13 +275,17 @@ class PartnerController extends Zend_Controller_Action
 			
 			$form->getElement('partnerId')->setAttrib('readonly',true);
 			
+			//to avoid changing an inherit class to its father 
+			if ($storage->protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+				$form->getElement('protocol')->setAttrib('disabled',true);
+			}
+			
 			$form->addFlavorParamsFields($flavorParamsResponse, $flavorParamsIds);
 			
 			if (!$request->isPost())
 				$form->populateFromObject($storage, false);
 		}
-		
-		
+				
 		if ($request->isPost())
 		{
 			$request = $this->getRequest();
@@ -295,31 +295,45 @@ class PartnerController extends Zend_Controller_Action
 			{
 				$this->view->formValid = true;
 				KalturaLog::log('Request: ' . print_r($request->getPost(), true));
-				$form->populate($request->getPost());
-				$storage = $form->getObject("Kaltura_Client_Type_StorageProfile", $request->getPost(), false, true);
+				$form->populate($formData);
 				
+				if (key_exists("protocol", $formData) && $formData["protocol"]){ //new storage
+					$protocol = $formData["protocol"];
+				}
+				
+				else if ($storage && $storage->protocol){ // edit mode
+					$protocol = $storage->protocol;
+				}		
+				
+				if($protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+					$storageFromForm = $form->getObject("Kaltura_Client_Type_AmazonS3StorageProfile", $formData, false, true);
+				}	
+				else{			
+					$storageFromForm = $form->getObject("Kaltura_Client_Type_StorageProfile", $formData, false, true);
+				}
+								
 				$flavorParams = array();
 				foreach($flavorParamsResponse->objects as $flavorParamsItem)
 					if($this->_getParam('flavorParamsId_' . $flavorParamsItem->id, false))
 						$flavorParams[] = $flavorParamsItem->id;
 				
 				if(count($flavorParams))
-					$storage->flavorParamsIds = implode(',', $flavorParams);
+					$storageFromForm->flavorParamsIds = implode(',', $flavorParams);
 				else		
-					$storage->flavorParamsIds = '';
+					$storageFromForm->flavorParamsIds = '';
 
-				KalturaLog::log('Storage: ' . print_r($storage, true));
+				KalturaLog::log('Storage: ' . print_r($storageFromForm, true));
 				
-				Infra_ClientHelper::impersonate($storage->partnerId);
-				$storage->partnerId = null;
+				Infra_ClientHelper::impersonate($storageFromForm->partnerId);
+				$storageFromForm->partnerId = null;
 				
 				if (!$editMode)
 				{
-					$client->storageProfile->add($storage);
+					$client->storageProfile->add($storageFromForm);
 				}
 				else
 				{
-					$client->storageProfile->update($storageId, $storage);
+					$client->storageProfile->update($storageId, $storageFromForm);
 				}
 			}
 			else
