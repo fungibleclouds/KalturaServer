@@ -34,8 +34,13 @@
 		
 		<?php echo $this->form->pathManagerClass;?>
 		<?php echo $this->form->protocol;?>
-		<?php echo $this->form->storageFtpPassiveMode;?>
-		<dt id="s"> &nbsp;</dt>
+		<div style="display: inline; visibility: hidden;">
+			<?php echo $this->form->storageFtpPassiveMode;?>
+		</div>
+		<div style="visibility: hidden;">
+			<?php echo $this->form->filesPermissionInS3;?>
+		</div>
+
 		<?php echo $this->form->storageUsername;?>
 		<?php echo $this->form->storagePassword;?>
 		</div>
@@ -85,6 +90,34 @@
 jQuery('[class=commentForm]').toggle();
 
 jQuery(document).ready(function() {
+	// Get selected storage protocol
+	var protocolUpdateView = function( protocol ) {
+		
+		switch ( protocol )
+		{	
+			case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
+				jQuery('#filesPermissionInS3-label').parent().css('visibility', 'visible');
+				jQuery('#filesPermissionInS3').parent().css('visibility', 'visible');
+				jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
+				break;
+			case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::FTP?>":
+				jQuery('#storageFtpPassiveMode').parent().css('visibility', 'visible');
+				jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
+				jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');				
+				break;
+			default:
+				jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');
+				jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
+				jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
+				break;
+		}
+	};
+
+	protocolUpdateView(jQuery('#protocol').val());
+	jQuery('#protocol').change(function() {
+		protocolUpdateView($(this).val());
+	});
+		
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPartnerFilter').submit();
