@@ -1219,6 +1219,9 @@ class kJobsManager
 		$netStorageExportData->setSrcFileSyncId($fileSync->getId());
 		$netStorageExportData->setForce($force);
 		$netStorageExportData->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
+		if ($externalStorage->getProtocol() == StorageProfile::STORAGE_PROTOCOL_S3){
+			$netStorageExportData->setFilesPermissionInS3($externalStorage->getFilesPermissionInS3());
+		}
 		
 		$batchJob = null;
 		if($parentJob)
