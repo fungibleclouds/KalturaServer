@@ -625,11 +625,12 @@ CREATE TABLE `partner_load`
 	`job_type` INTEGER  NOT NULL,
 	`job_sub_type` INTEGER default 0 NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
+	`dc` INTEGER  NOT NULL,
 	`partner_load` INTEGER,
 	`weighted_partner_load` INTEGER,
 	`custom_data` TEXT,
-	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`),
-	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`)
+	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`,`dc`),
+	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`, `dc`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
