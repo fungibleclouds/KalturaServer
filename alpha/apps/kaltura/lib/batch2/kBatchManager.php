@@ -221,7 +221,13 @@ class kBatchManager
 				if (kConf::hasParam('max_mbr_flavor_bitrate'))
 					$maxMbrBitrate = kConf::get('max_mbr_flavor_bitrate');
 				
-				if (!KDLWrap::CDLIsFLV($mediaInfoDb) || $mediaInfoDb->getContainerBitRate() >= $maxMbrBitrate)
+				if(!KDLWrap::CDLIsFLV($mediaInfoDb))
+				{
+					$key = array_search(flavorParams::TAG_MBR, $tagsArray);
+					unset($tagsArray[$key]);
+				}
+				
+				if ($mediaInfoDb->getContainerBitRate() >= $maxMbrBitrate)
 				{
 					$tagsArray = array_unique($tagsArray);
 					$key = array_search(flavorParams::TAG_MBR, $tagsArray);
