@@ -116,7 +116,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$this->loadXslt();
 			
-		$xdoc = new KDOMDocument();
+		$xdoc = new DomDocument();
 		
 		$xmlContent = $this->xslTransform($this->data->filePath);
 		libxml_clear_errors();
@@ -170,7 +170,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return $xdoc;
 		
 		libxml_clear_errors();
-		$xml = new KDOMDocument();
+		$xml = new DOMDocument();
 		if(!$xml->loadXML($xdoc)){
 			KalturaLog::debug("Could not load xml");
 			$errorMessage = kXml::getLibXmlErrorDescription($xdoc);
@@ -179,7 +179,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
-		$xsl = new KDOMDocument();
+		$xsl = new DOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
@@ -623,7 +623,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 		//Creates new category associations between the entry and the categories
-		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult);
+		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 				
@@ -1079,44 +1079,107 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
 	{
-	    $this->impersonate();
-	    
-	    $categoriesArr = explode(",", $categories);
-	    $ret = array();
-	    foreach ($categoriesArr as $categoryName)
-	    {
-	        $categoryFilter = new KalturaCategoryFilter();
-	        $categoryFilter->fullNameEqual = $categoryName;
-	        $res = $this->kClient->category->listAction($categoryFilter, new KalturaFilterPager());
-	        if (!count($res->objects))
-	        {
-	           $res = $this->createCategoryByPath($categoryName);
-	           if (! $res instanceof  KalturaCategory)
-	           {
-	               $bulkuploadResult->errorDescription .= $res;
-	               continue;
-	           }
-	           
-	           $category = $res;
-	        }
-	        else 
-	        {
-	            $category = $res->objects[0];
-	        }
-	        $categoryEntry = new KalturaCategoryEntry();
-	        $categoryEntry->categoryId = $category->id;
-	        $categoryEntry->entryId = $entryId;
-	        try {
-	            $this->kClient->categoryEntry->add($categoryEntry);
-	        }
-	        catch (Exception $e)
-	        {
-	            $bulkuploadResult->errorDescription .= $e->getMessage();
-	        }
-	    }
-	    
-	    $this->unimpersonate();
-	    return $bulkuploadResult;
+		// no change requested
+		if(is_null($categories))
+			return $bulkuploadResult;
+		
+		$this->impersonate();
+		
+		$existingCategoryIds = array(); // category ids that already associated with the entry - current list
+		$requiredCategoryIds = array(); // category ids that should be associated with the entry - final list
+		
+
+		try
+		{
+			$this->kClient->startMultiRequest();
+			if($update)
+			{
+				$categoryEntryFilter = new KalturaCategoryEntryFilter();
+				$categoryEntryFilter->entryIdEqual = $entryId;
+				$this->kClient->categoryEntry->listAction($categoryEntryFilter);
+			}
+			if($categories)
+			{
+				$categoryFilter = new KalturaCategoryFilter();
+				$categoryFilter->fullNameIn = $categories;
+				$this->kClient->category->listAction($categoryFilter);
+			}
+			$responses = $this->kClient->doMultiRequest();
+			if($update)
+			{
+				$categoryEntryListResponse = array_shift($responses);
+				/* @var $categoryEntryListResponse KalturaCategoryEntryListResponse */
+				
+				foreach($categoryEntryListResponse->objects as $categoryEntry)
+				{
+					/* @var $categoryEntry KalturaCategoryEntry */
+					$existingCategoryIds[] = $categoryEntry->categoryId;
+				}
+			}
+			
+			if($categories)
+			{
+				$categoryListResponse = array_shift($responses);
+				/* @var $categoryEntryListResponse KalturaCategoryEntryListResponse */
+				
+				$existingCategoryNames = array();
+				foreach($categoryListResponse->objects as $category)
+				{
+					$existingCategoryNames[] = $category->fullName;
+					$requiredCategoryIds[] = $category->id;
+				}
+				
+				$categoryNamesArr = explode(',', $categories);
+				$this->kClient->startMultiRequest();
+				foreach($categoryNamesArr as $categoryName)
+				{
+					if(in_array($categoryName, $existingCategoryNames)) //Category does not exis 
+					{
+						KalturaLog::debug("Creating a new category by the name [$categoryName]");
+						$this->createCategoryByPath($categoryName);
+					}
+				}
+				$createdCategories = $this->kClient->doMultiRequest();
+				foreach($createdCategories as $createdCategory)
+				{
+					/* @var $createdCategory KalturaCategory */
+					$requiredCategoryIds[] = $createdCategory->id; //Adding the newly created category IDs to the ToWork list
+				}
+			}
+			
+			$this->kClient->startMultiRequest();
+			
+			if($update) // Remove existing categories and associations
+			{
+				$categoryIdsToRemove = array_diff($existingCategoryIds, $requiredCategoryIds);
+				foreach($categoryIdsToRemove as $categoryIdToRemove)
+				{
+					KalturaLog::debug("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
+					$this->kClient->categoryEntry->delete($entryId, $categoryIdToRemove);
+				}
+			}
+			
+			//Add new categories and associations
+			$categoryIdsToAdd = array_diff($requiredCategoryIds, $existingCategoryIds);
+			foreach($categoryIdsToAdd as $categoryIdToAdd)
+			{
+				$categoryEntryToAdd = new KalturaCategoryEntry();
+				$categoryEntryToAdd->categoryId = $categoryIdToAdd;
+				$categoryEntryToAdd->entryId = $entryId;
+				KalturaLog::debug("Adding category ID [$categoryIdToAdd] to entry [$entryId]");
+				$this->kClient->categoryEntry->add($categoryEntryToAdd);
+			}
+			
+			$this->kClient->doMultiRequest();
+		
+		}
+		catch(KalturaException $ex)
+		{
+			$bulkuploadResult->errorDescription .= $ex->getMessage();
+		}
+		
+		$this->unimpersonate();
+		return $bulkuploadResult;
 	}
 	
 	private function createCategoryByPath ($fullname)
