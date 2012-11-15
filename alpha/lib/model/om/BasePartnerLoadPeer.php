@@ -26,7 +26,7 @@ abstract class BasePartnerLoadPeer {
 	const TM_CLASS = 'PartnerLoadTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 8;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -40,11 +40,17 @@ abstract class BasePartnerLoadPeer {
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'partner_load.PARTNER_ID';
 
+	/** the column name for the DC field */
+	const DC = 'partner_load.DC';
+
 	/** the column name for the PARTNER_LOAD field */
 	const PARTNER_LOAD = 'partner_load.PARTNER_LOAD';
 
 	/** the column name for the WEIGHTED_PARTNER_LOAD field */
 	const WEIGHTED_PARTNER_LOAD = 'partner_load.WEIGHTED_PARTNER_LOAD';
+
+	/** the column name for the QUOTA field */
+	const QUOTA = 'partner_load.QUOTA';
 
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'partner_load.CUSTOM_DATA';
@@ -65,11 +71,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'PartnerLoad', 'WeightedPartnerLoad', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'partnerLoad', 'weightedPartnerLoad', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'partner_load', 'weighted_partner_load', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'Dc', 'PartnerLoad', 'WeightedPartnerLoad', 'Quota', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'dc', 'partnerLoad', 'weightedPartnerLoad', 'quota', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::DC, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, self::QUOTA, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'dc', 'partner_load', 'weighted_partner_load', 'quota', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -79,11 +85,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'PartnerLoad' => 3, 'WeightedPartnerLoad' => 4, 'CustomData' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'partnerLoad' => 3, 'weightedPartnerLoad' => 4, 'customData' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::PARTNER_LOAD => 3, self::WEIGHTED_PARTNER_LOAD => 4, self::CUSTOM_DATA => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'partner_load' => 3, 'weighted_partner_load' => 4, 'custom_data' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'Dc' => 3, 'PartnerLoad' => 4, 'WeightedPartnerLoad' => 5, 'Quota' => 6, 'CustomData' => 7, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'dc' => 3, 'partnerLoad' => 4, 'weightedPartnerLoad' => 5, 'quota' => 6, 'customData' => 7, ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::DC => 3, self::PARTNER_LOAD => 4, self::WEIGHTED_PARTNER_LOAD => 5, self::QUOTA => 6, self::CUSTOM_DATA => 7, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'dc' => 3, 'partner_load' => 4, 'weighted_partner_load' => 5, 'quota' => 6, 'custom_data' => 7, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -156,8 +162,10 @@ abstract class BasePartnerLoadPeer {
 		$criteria->addSelectColumn(PartnerLoadPeer::JOB_TYPE);
 		$criteria->addSelectColumn(PartnerLoadPeer::JOB_SUB_TYPE);
 		$criteria->addSelectColumn(PartnerLoadPeer::PARTNER_ID);
+		$criteria->addSelectColumn(PartnerLoadPeer::DC);
 		$criteria->addSelectColumn(PartnerLoadPeer::PARTNER_LOAD);
 		$criteria->addSelectColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
+		$criteria->addSelectColumn(PartnerLoadPeer::QUOTA);
 		$criteria->addSelectColumn(PartnerLoadPeer::CUSTOM_DATA);
 	}
 
@@ -399,6 +407,12 @@ abstract class BasePartnerLoadPeer {
 		if(self::$s_criteria_filter == null)
 			PartnerLoadPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PartnerLoad');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PartnerLoadPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 
@@ -578,7 +592,7 @@ abstract class BasePartnerLoadPeer {
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
-				$key = serialize(array((string) $obj->getJobType(), (string) $obj->getJobSubType(), (string) $obj->getPartnerId()));
+				$key = serialize(array((string) $obj->getJobType(), (string) $obj->getJobSubType(), (string) $obj->getPartnerId(), (string) $obj->getDc()));
 			} // if key === null
 			self::$instances[$key] = $obj;
 		}
@@ -598,10 +612,10 @@ abstract class BasePartnerLoadPeer {
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
 			if (is_object($value) && $value instanceof PartnerLoad) {
-				$key = serialize(array((string) $value->getJobType(), (string) $value->getJobSubType(), (string) $value->getPartnerId()));
-			} elseif (is_array($value) && count($value) === 3) {
+				$key = serialize(array((string) $value->getJobType(), (string) $value->getJobSubType(), (string) $value->getPartnerId(), (string) $value->getDc()));
+			} elseif (is_array($value) && count($value) === 4) {
 				// assume we've been passed a primary key
-				$key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+				$key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2], (string) $value[3]));
 			} else {
 				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or PartnerLoad object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
@@ -666,10 +680,10 @@ abstract class BasePartnerLoadPeer {
 	public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
 	{
 		// If the PK cannot be derived from the row, return NULL.
-		if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
+		if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null && $row[$startcol + 3] === null) {
 			return null;
 		}
-		return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
+		return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2], (string) $row[$startcol + 3]));
 	}
 
 	/**
@@ -810,6 +824,9 @@ abstract class BasePartnerLoadPeer {
 			$comparison = $criteria->getComparison(PartnerLoadPeer::PARTNER_ID);
 			$selectCriteria->add(PartnerLoadPeer::PARTNER_ID, $criteria->remove(PartnerLoadPeer::PARTNER_ID), $comparison);
 
+			$comparison = $criteria->getComparison(PartnerLoadPeer::DC);
+			$selectCriteria->add(PartnerLoadPeer::DC, $criteria->remove(PartnerLoadPeer::DC), $comparison);
+
 		} else { // $values is PartnerLoad object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
@@ -900,6 +917,7 @@ abstract class BasePartnerLoadPeer {
 				$criterion = $criteria->getNewCriterion(PartnerLoadPeer::JOB_TYPE, $value[0]);
 				$criterion->addAnd($criteria->getNewCriterion(PartnerLoadPeer::JOB_SUB_TYPE, $value[1]));
 				$criterion->addAnd($criteria->getNewCriterion(PartnerLoadPeer::PARTNER_ID, $value[2]));
+				$criterion->addAnd($criteria->getNewCriterion(PartnerLoadPeer::DC, $value[3]));
 				$criteria->addOr($criterion);
 				// we can invalidate the cache for this single PK
 				PartnerLoadPeer::removeInstanceFromPool($value);
@@ -968,11 +986,12 @@ abstract class BasePartnerLoadPeer {
 	 * @param      int $job_type
 	 * @param      int $job_sub_type
 	 * @param      int $partner_id
+	 * @param      int $dc
 	 * @param      PropelPDO $con
 	 * @return     PartnerLoad
 	 */
-	public static function retrieveByPK($job_type, $job_sub_type, $partner_id, PropelPDO $con = null) {
-		$key = serialize(array((string) $job_type, (string) $job_sub_type, (string) $partner_id));
+	public static function retrieveByPK($job_type, $job_sub_type, $partner_id, $dc, PropelPDO $con = null) {
+		$key = serialize(array((string) $job_type, (string) $job_sub_type, (string) $partner_id, (string) $dc));
  		if (null !== ($obj = PartnerLoadPeer::getInstanceFromPool($key))) {
  			return $obj;
 		}
@@ -981,6 +1000,7 @@ abstract class BasePartnerLoadPeer {
 		$criteria->add(PartnerLoadPeer::JOB_TYPE, $job_type);
 		$criteria->add(PartnerLoadPeer::JOB_SUB_TYPE, $job_sub_type);
 		$criteria->add(PartnerLoadPeer::PARTNER_ID, $partner_id);
+		$criteria->add(PartnerLoadPeer::DC, $dc);
 		$v = PartnerLoadPeer::doSelect($criteria, $con);
 
 		return !empty($v) ? $v[0] : null;
